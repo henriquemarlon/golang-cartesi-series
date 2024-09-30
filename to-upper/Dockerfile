@@ -28,8 +28,8 @@ ENV PATH=/usr/local/go/bin:${PATH}
 # Leverage bind mounts to go.sum and go.mod to avoid having to copy them into
 # the container.
 RUN --mount=type=cache,target=/go/pkg/mod/ \
-    --mount=type=bind,source=./src/go.sum,target=./go.sum \
-    --mount=type=bind,source=./src/go.mod,target=./go.mod \
+    --mount=type=bind,source=./go.sum,target=./go.sum \
+    --mount=type=bind,source=./go.mod,target=./go.mod \
     go mod download -x
 
 # Build the application.
@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 # source code into the container.
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    CGO_ENABLED=1 GOARCH=riscv64 GOOS=linux CC=riscv64-linux-gnu-gcc go build -o /opt/build/dapp .
+    CGO_ENABLED=1 GOARCH=riscv64 GOOS=linux CC=riscv64-linux-gnu-gcc go build -o /opt/build/dapp ./src
 
 # runtime stage: produces final image that will be executed
 FROM --platform=linux/riscv64 riscv64/ubuntu:22.04
